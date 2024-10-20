@@ -11,6 +11,23 @@ This is a simple Tic-Tac-Toe game implemented using Python and sockets.
 **Technologies used:**
 * Python
 * Sockets
+* JSON
+
+# Messaging protocol
+The clients need to be able to communicate with each other as well as the server. For this purpose JSON validation is done to determine what each message type is supposed to be once its sent. Each message has a Message Type that defines the action and the Message Data which is the actual contents of the message.
+## Message types
+* Join: when the client sends this message it tells the server they want to game. They are placed in a waiting room until another client also joins and enteres the waiting room. In this message the data is less important as it can't change anything.
+* Move: This will be the message the client sends when they want to make a move in the game. The Type is "move" the data will be one of the 9 available spaces.
+* Chat: This message will be whatever the client wants. The type is "data" and the data is literally anything they want to say to the other player.
+* Quit: this message will be what a client sends when they are done playing the game. Again the data here is less important than the type.
+
+# Server Responses
+The server has to process the messages sent by clients. This is done by validating a JSON format. After each message is validated the server may need to respond in some way.
+* Join: If a player joins a server succesfully, the server will send a confirmation response.
+* Move: If a player makes a valid move, the server confirms this and updates the board.
+* Win: If a players move results in a win condition, the server will send a message to both players acknowledging this.
+* Invalid Command: If the server gets some command that doesn't align with any valid JSON it will send a response to notify the client of this and ask for another.
+* Disconnect: When a player quits, the server will recognize this and removes them from the game.
 
 **Additional resources:**
 -TBA
