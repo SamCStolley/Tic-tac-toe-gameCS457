@@ -29,6 +29,20 @@ The server has to process the messages sent by clients. This is done by validati
 * Invalid Command: If the server gets some command that doesn't align with any valid JSON it will send a response to notify the client of this and ask for another.
 * Disconnect: When a player quits, the server will recognize this and removes them from the game.
 
+# Game State Consistency
+In order to maintain the integrity of the game of tic tac toe, the server implments and maintains a game board that is synchronized
+across the two people playing.
+* It maintains which player is the "current" player who is in control of the current move.
+* It assigns each player a unique ID to facilitate this easier.
+* Turn based play helps to enforce consistency of the gameboard between the two players. If a player tries to take a move outside of there turns
+the server will send an error message to them.
+* When the current player finishes there move, the server checks the board for a win condition (three in a row) and declares a winner
+if the condition is in fact met.
+* The server additionally checks for a stalemate condition, which in this case is simply if the board is completely full without a winner, not
+if no win is possible.
+* Once the move is made, the game state is broadcast to both clients which updates there copy of the board. This also includes the ID of the
+current player as well as a message declaring a win or stalemate.
+* Should a player disconnect from the game early, the server will notify the remaining player and reset the board. 
 **Additional resources:**
 -TBA
 
