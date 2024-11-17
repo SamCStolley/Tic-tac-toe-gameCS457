@@ -3,22 +3,25 @@
 This is a simple Tic-Tac-Toe game implemented using Python and sockets.
 
 **How to play:**
-1. **Start the server:** Run the `server.py` script.
-2. **Connect clients:** Run the `client.py` script on two different machines or terminals.
-3. **Play the game:** Players take turns entering their moves. The first player to get three in a row wins!
-4. **Determine a winner** The player wins will be tallied until they leave the game.
+1. **Start the server:** Run the `server.py` script in your preffered IDE.
+2. **Enter Details** You will be prompted to enter in the Host IP and port number you would like to use. Enter two valid options and the server will start and begin to listen on that port.
+3. **Start the Clients** On two other devices, load the client.py into your IDE and start it. You will be prompted to enter in the host and port. Entering the same as the server will connect a client.
+4. **Play the game** Once you have two clients connected, the game will begin. Play tic tac toe as normal. When a game reaches an end state (ie. a tie or a win) a message will declare so. The board will be reset and another game can be played.
+5. **Quitting the game** I am still implementing a dedicated option to begin a new game or disconnect.
 
 **Technologies used:**
 * Python
 * Sockets
 * JSON
+* threading
+* Logging
+* 
 
 # Messaging protocol
 The clients need to be able to communicate with each other as well as the server. For this purpose JSON validation is done to determine what each message type is supposed to be once its sent. Each message has a Message Type that defines the action and the Message Data which is the actual contents of the message.
 ## Message types
 * Join: when the client sends this message it tells the server they want to game. They are placed in a waiting room until another client also joins and enteres the waiting room. In this message the data is less important as it can't change anything.
 * Move: This will be the message the client sends when they want to make a move in the game. The Type is "move" the data will be one of the 9 available spaces.
-* Chat: This message will be whatever the client wants. The type is "data" and the data is literally anything they want to say to the other player.
 * Quit: this message will be what a client sends when they are done playing the game. Again the data here is less important than the type.
 
 # Server Responses
