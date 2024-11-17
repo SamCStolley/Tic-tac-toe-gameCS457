@@ -5,8 +5,9 @@ import logging
 
 logging.basicConfig(filename='server.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-HOST = '127.0.0.1'
-PORT = 65432
+# Prompt the user for host and port at startup
+HOST = input("Enter the host address (e.g., 127.0.0.1): ").strip()
+PORT = int(input("Enter the port number (e.g., 65432): ").strip())
 
 clients = []
 game_board = [" " for _ in range(9)]
