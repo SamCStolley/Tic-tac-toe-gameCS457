@@ -12,6 +12,7 @@ PORT = int(input("Enter the port number (e.g., 65432): ").strip())
 clients = []
 game_board = [" " for _ in range(9)]
 current_turn = 0  # Tracks whose turn it is (0 for Player 1, 1 for Player 2)
+win_counts = [0, 0]  # Tracks wins for Player 1 and Player 2
 
 # Broadcast a message to all clients
 def broadcast(message):
@@ -32,10 +33,9 @@ def check_game_status():
 
 # Handle client moves and game updates
 def handle_client(conn, player_id):
-    global current_turn, game_board
+    global current_turn, game_board, win_counts
     conn.send(json.dumps({"player_id": player_id}).encode('utf-8'))
 
-    # Start the game once two players are connected
     if len(clients) == 2:
         broadcast(json.dumps({"type": "start_game", "current_turn": current_turn}).encode('utf-8'))
 
@@ -56,10 +56,20 @@ def handle_client(conn, player_id):
                     winner = check_game_status()
 
                     if winner:
-                        broadcast(json.dumps({"type": "game_over", "winner": winner, "board": game_board}).encode('utf-8'))
-                        game_board = [" " for _ in range(9)]  # Reset the board
+                        if winner != "Draw":
+                            winning_player = 0 if winner == "X" else 1
+                            win_counts[winning_player] += 1
+                        broadcast(json.dumps({
+                            "type": "game_over", 
+                            "winner": winner, 
+                            "board": game_board, 
+                            "win_counts": win_counts
+                        }).encode('utf-8'))
+                        # Reset the game for a new round
+                        game_board = [" " for _ in range(9)]
+                        current_turn = 0  # Player 1 always starts
+                        broadcast(json.dumps({"type": "reset_game", "current_turn": current_turn}).encode('utf-8'))
                     else:
-                        # Switch turns and update the board for both players
                         current_turn = 1 - current_turn
                         broadcast(json.dumps({"type": "update", "board": game_board, "current_turn": current_turn}).encode('utf-8'))
                 else:
@@ -70,6 +80,8 @@ def handle_client(conn, player_id):
 
     conn.close()
     clients.remove((conn, player_id))
+    if clients:
+        broadcast(json.dumps({"type": "waiting"}).encode('utf-8'))
 
 # Start the server
 def start_server():
