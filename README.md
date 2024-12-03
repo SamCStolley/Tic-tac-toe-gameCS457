@@ -7,7 +7,7 @@ This is a simple Tic-Tac-Toe game implemented using Python and sockets.
 2. **Enter Details** You will be prompted to enter in the Host IP and port number you would like to use. Enter two valid options and the server will start and begin to listen on that port.
 3. **Start the Clients** On two other devices, load the client.py into your IDE and start it. You will be prompted to enter in the host and port. Entering the same as the server will connect a client.
 4. **Play the game** Once you have two clients connected, the game will begin. Play tic tac toe as normal. When a game reaches an end state (ie. a tie or a win) a message will declare so. The board will be reset and another game can be played.
-5. **Quitting the game** I am still implementing a dedicated option to begin a new game or disconnect.
+5. **Quitting the game** When you are ready to quit playing, simply click the disconnect button and you will be removed from the server.
 
 **Technologies used:**
 * Python
@@ -15,7 +15,7 @@ This is a simple Tic-Tac-Toe game implemented using Python and sockets.
 * JSON
 * threading
 * Logging
-* 
+* Tkinter
 
 # Messaging protocol
 The clients need to be able to communicate with each other as well as the server. For this purpose JSON validation is done to determine what each message type is supposed to be once its sent. Each message has a Message Type that defines the action and the Message Data which is the actual contents of the message.
@@ -29,6 +29,7 @@ The server has to process the messages sent by clients. This is done by validati
 * Join: If a player joins a server succesfully, the server will send a confirmation response.
 * Move: If a player makes a valid move, the server confirms this and updates the board.
 * Win: If a players move results in a win condition, the server will send a message to both players acknowledging this.
+* Tie: If a game ends in a stalemate, the game will reset and increment the tie counter.
 * Invalid Command: If the server gets some command that doesn't align with any valid JSON it will send a response to notify the client of this and ask for another.
 * Disconnect: When a player quits, the server will recognize this and removes them from the game.
 
@@ -47,7 +48,7 @@ if no win is possible.
 current player as well as a message declaring a win or stalemate.
 * Should a player disconnect from the game early, the server will notify the remaining player and reset the board. 
 **Additional resources:**
--TBA
+
 
 # Statement of Work
 
@@ -105,4 +106,3 @@ involve at least 2 players playing a simple game while taking turns.
 * This is a solo project so I will be entirely in charge of all tasks and there will be no communication channels save those with TA's in the event I run into a problem I can't solve myself.
 
 ## Additional Notes:
-* -TBA
