@@ -5,7 +5,6 @@ import logging
 
 logging.basicConfig(filename='server.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Prompt the user for host and port at startup
 HOST = input("Enter the host address (e.g., 127.0.0.1): ").strip()
 PORT = int(input("Enter the port number (e.g., 65432): ").strip())
 
@@ -13,6 +12,7 @@ clients = []
 game_board = [" " for _ in range(9)]
 current_turn = 0  # Tracks whose turn it is (0 for Player 1, 1 for Player 2)
 win_counts = [0, 0]  # Tracks wins for Player 1 and Player 2
+tie_count = 0  # Tracks the number of ties
 
 # Broadcast a message to all clients
 def broadcast(message):
@@ -31,9 +31,15 @@ def check_game_status():
         return "Draw"
     return None
 
+# Reset the game
+def reset_game():
+    global game_board, current_turn
+    game_board = [" " for _ in range(9)]
+    current_turn = 0
+
 # Handle client moves and game updates
 def handle_client(conn, player_id):
-    global current_turn, game_board, win_counts
+    global current_turn, game_board, win_counts, tie_count
     conn.send(json.dumps({"player_id": player_id}).encode('utf-8'))
 
     if len(clients) == 2:
@@ -56,18 +62,27 @@ def handle_client(conn, player_id):
                     winner = check_game_status()
 
                     if winner:
-                        if winner != "Draw":
+                        if winner == "Draw":
+                            tie_count += 1
+                            broadcast(json.dumps({
+                                "type": "game_over",
+                                "winner": "Draw",
+                                "board": game_board,
+                                "win_counts": win_counts,
+                                "tie_count": tie_count
+                            }).encode('utf-8'))
+                        else:
                             winning_player = 0 if winner == "X" else 1
                             win_counts[winning_player] += 1
-                        broadcast(json.dumps({
-                            "type": "game_over", 
-                            "winner": winner, 
-                            "board": game_board, 
-                            "win_counts": win_counts
-                        }).encode('utf-8'))
-                        # Reset the game for a new round
-                        game_board = [" " for _ in range(9)]
-                        current_turn = 0  # Player 1 always starts
+                            broadcast(json.dumps({
+                                "type": "game_over",
+                                "winner": winning_player,
+                                "board": game_board,
+                                "win_counts": win_counts,
+                                "tie_count": tie_count
+                            }).encode('utf-8'))
+                        
+                        reset_game()
                         broadcast(json.dumps({"type": "reset_game", "current_turn": current_turn}).encode('utf-8'))
                     else:
                         current_turn = 1 - current_turn
@@ -78,10 +93,23 @@ def handle_client(conn, player_id):
         except (ConnectionResetError, json.JSONDecodeError):
             break
 
+    # Handle client disconnection
     conn.close()
     clients.remove((conn, player_id))
-    if clients:
-        broadcast(json.dumps({"type": "waiting"}).encode('utf-8'))
+
+    if len(clients) == 1:
+        # Handle remaining player: reset game and treat disconnect as a tie
+        tie_count += 1
+        reset_game()
+        current_turn = 0  # Remaining player always starts new games
+        remaining_conn, remaining_player_id = clients[0]
+        remaining_conn.send(json.dumps({
+            "type": "player_disconnect",
+            "tie_count": tie_count,
+            "board": game_board
+        }).encode('utf-8'))
+    elif len(clients) == 0:
+        reset_game()
 
 # Start the server
 def start_server():
