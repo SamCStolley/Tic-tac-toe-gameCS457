@@ -46,9 +46,7 @@ if the condition is in fact met.
 if no win is possible.
 * Once the move is made, the game state is broadcast to both clients which updates there copy of the board. This also includes the ID of the
 current player as well as a message declaring a win or stalemate.
-* Should a player disconnect from the game early, the server will notify the remaining player and reset the board. 
-**Additional resources:**
-
+* Should a player disconnect from the game early, the server will notify the remaining player and reset the board.
 
 # Statement of Work
 
