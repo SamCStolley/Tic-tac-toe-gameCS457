@@ -1,0 +1,9 @@
+Libraries:
+* Socket
+* Threading
+* JSON
+* Tkinter
+* Logging
+* Time (optional)
+
+PYTHON VERSION: 3.x (3.7 preferred)
