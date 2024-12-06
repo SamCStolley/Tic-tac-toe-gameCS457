@@ -3,10 +3,10 @@
 This is a simple Tic-Tac-Toe game implemented using Python and sockets.
 
 **How to play:**
-1. **Start the server:** Run the `server.py` script in your preffered IDE.
+1. **Start the server:** Run the `server.py` script in your preffered IDE or by typing "**python server.py** " in a terminal set to the directory where the program is installed.
 2. **Enter Details** You will be prompted to enter in the Host IP and port number you would like to use. Enter two valid options and the server will start and begin to listen on that port.
-3. **Start the Clients** On two other devices, load the client.py into your IDE and start it. You will be prompted to enter in the host and port. Entering the same as the server will connect a client.
-4. **Play the game** Once you have two clients connected, the game will begin. Play tic tac toe as normal. When a game reaches an end state (ie. a tie or a win) a message will declare so. The board will be reset and another game can be played.
+3. **Start the Clients** On two other devices, load the client.py into your IDE and start it, or similairly use your terminal and type "**python client.py**". You will be prompted to enter in the host and port. Entering the same as the server will connect a client. Do this twice for both clients.
+4. **Play the game** Once you have two clients connected, the game will begin. Play tic tac toe as normal. When a game reaches an end state (ie. a tie or a win) a message will declare so. The board will be reset and another game can be played. Each client will have individual score counts counting ties and wins.
 5. **Quitting the game** When you are ready to quit playing, simply click the disconnect button and you will be removed from the server.
 
 **Technologies used:**
@@ -90,6 +90,12 @@ involve at least 2 players playing a simple game while taking turns.
 * Create Client.py
 * Create and intigrate game functionality into the two files
 
+## Security/Risk Evaluation
+* There is no authentication in my current implementation, which means anyone can connect including malicious actors.
+* There is also no input validation currently. The JSON does only accept certain data types but does not do data validation so bad input could crash the server. For instance, the JSON may expect numbers between 0 and 8 but doesn't actually check if that is sent in the message type, just that the message is an expected type.
+* This server is very vulnerable to a DDOS attack as there is no input limit so it could easily be flooded to the point of not functioning.
+* There is no encryption currently which means all messages can be intercepted and potentially tampered with.
+* The server is also very vulnerable to a replay attack as it does not do any uniqueness check.
 ## Technical Requirements
 **Hardware**
 * This should not be more than simply having access to 3 computers capable of running .py programs.
@@ -105,4 +111,6 @@ involve at least 2 players playing a simple game while taking turns.
 ## Roles and Responsibilities
 * This is a solo project so I will be entirely in charge of all tasks and there will be no communication channels save those with TA's in the event I run into a problem I can't solve myself.
 
-## Additional Notes:
+## Retrospective
+* What went right: I'm very pleased with how the UI for the client proram turned out. It's easy to use and easy to understand what each part does. Additionally, the messaging and use of JSON worked out very well for keeping the game consistent across the multiple players, by assigning the different buttons a JSON data message, it means it's difficult for users to accidentally send bad data.
+* What could be improved on: There are a few bugs I was just not able to track down. The most notable one is that when a player disconnects and reconnects, sometimes but not always the board does not reset and both players get softlocked where no matter who presses which position, the game claims "invalid input or not your turn". I'm fairly sure it's caused by a desync somewhere on the server but I havent nailed it down. Additionally, I have a bug where when a player disconnects and reconnects, the original player is not removed from the list of active players which leaves a phantom second player. As far as improvements to the code itself, I could have fairly simply implemented code to allow for more than 2 players to play at once. Create a new room for every two players so multiple games can run at the same time for many players. On top of this, it wouldn't be too difficult to implement a couple new games, notably battleship as I could use the same UI and have players initially mark their board with where they want their ships and the opponent clicks spots and they are marked as hits or misses until one wins.
